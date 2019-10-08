@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">EAI UTS</string>
+    <string name="facebook_app_id">509874796461197</string>
+    <string name="fb_login_protocol_scheme">fb509874796461197</string>
+    <string name="title_activity_home_page">Artikel</string>
+    <string name="server_client_id">346671154197-9klsv8251umjp1gr0nnmgr7fngo0936r.apps.googleusercontent.com</string>
+    <string name="cancel">cancel</string>
+</resources>
