@@ -69,6 +69,27 @@
 
         </com.google.android.gms.common.SignInButton>
 
+
+        <Button
+            android:id="@+id/btn_twitter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Twitter" />
+
+        <Button
+            android:id="@+id/btn_instagram"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:onClick="onClick"
+            android:text="INSTAGRAM LOGIN"
+            tools:ignore="OnClick" />
+
+
     </LinearLayout>
 
 </LinearLayout>
+

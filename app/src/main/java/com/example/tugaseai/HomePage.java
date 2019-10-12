@@ -38,6 +38,9 @@ public class HomePage extends AppCompatActivity {
     PostAdapter adapter;
     String nama;
     private GoogleSignInClient googleSignInClient;
+    private AppPreferences appPreferences = null;
+    private String token = null;
+    private View info = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +112,7 @@ public class HomePage extends AppCompatActivity {
 
         if (item.getItemId()==R.id.logout){
           SignOut();
+
         }
 
 
@@ -134,6 +138,14 @@ public class HomePage extends AppCompatActivity {
         });
 
         LoginManager.getInstance().logOut();
+        logout();
+    }
+
+    public void logout() {
+        appPreferences = new AppPreferences(this);
+        info = findViewById(R.id.info);
+        token = null;
+        appPreferences.clear();
     }
 
 }

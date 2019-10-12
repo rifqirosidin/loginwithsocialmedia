@@ -2,12 +2,15 @@ package com.example.tugaseai;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,9 +35,24 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
+import com.twitter.sdk.android.core.DefaultLogger;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterConfig;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -42,7 +60,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AuthenticationListener {
     Boolean cekLoginFb = false;
     Button btnGoogle, btnFB, btnLogin;
     TextView tvDaftar;
@@ -52,7 +70,12 @@ public class MainActivity extends AppCompatActivity {
     private SignInButton goSignInButton;
     LoginButton loginButton;
     private CallbackManager callbackManager;
-//
+    private String token = null;
+    private AppPreferences appPreferences = null;
+    private AuthenticationDialog authenticationDialog = null;
+    private Button button = null;
+    private View info = null;
+    Button btnTwitter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,13 +88,30 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btn_login);
         edtUsername = findViewById(R.id.edt_username);
         edtPassword = findViewById(R.id.edt_password);
-
+        btnTwitter = findViewById(R.id.btn_twitter);
 
 
         loginButton = findViewById(R.id.btn_fb);
         loginButton.setReadPermissions(Arrays.asList("email", "public_profile"));
+        button = findViewById(R.id.btn_instagram);
+        info = findViewById(R.id.info);
+        appPreferences = new AppPreferences(this);
+
+        btnTwitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TwitterHelper.class);
+                startActivity(intent);
+            }
+        });
+        //check already have access token
+        token = appPreferences.getString(AppPreferences.TOKEN);
+        if (token != null) {
+            getUserInfoByAccessToken(token);
+        }
 
 
+//        viewGroupOfSomeSort.addView(telegramButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
          callbackManager = CallbackManager.Factory.create();
 
@@ -222,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void useLoginInformation(AccessToken accessToken) {
         /**
-         Creating the GraphRequest to fetch user details
+         Creating git the GraphRequest to fetch user details
          1st Param - AccessToken
          2nd Param - Callback (which will be invoked once the request is successful)
          **/
@@ -250,6 +290,87 @@ public class MainActivity extends AppCompatActivity {
         // Initiate the GraphRequest
         request.executeAsync();
     }
+
+
+
+    public void logout() {
+        button.setText("INSTAGRAM LOGIN");
+        token = null;
+        info.setVisibility(View.GONE);
+        appPreferences.clear();
+    }
+    @Override
+    public void onTokenReceived(String auth_token) {
+        if (auth_token == null)
+            return;
+        appPreferences.putString(AppPreferences.TOKEN, auth_token);
+        token = auth_token;
+        getUserInfoByAccessToken(token);
+    }
+
+    public void onClick(View view) {
+        if(token!=null)
+        {
+            logout();
+        }
+        else {
+            authenticationDialog = new AuthenticationDialog(this,  this);
+            authenticationDialog.setCancelable(true);
+            authenticationDialog.show();
+        }
+    }
+    private void getUserInfoByAccessToken(String token) {
+        new RequestInstagramAPI().execute();
+    }
+
+    private class RequestInstagramAPI extends AsyncTask<Void, String, String> {
+
+        @Override
+        protected String doInBackground(Void... params) {
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpGet httpGet = new HttpGet(getResources().getString(R.string.get_user_info_url) + token);
+            try {
+                HttpResponse response = httpClient.execute(httpGet);
+                HttpEntity httpEntity = response.getEntity();
+                return EntityUtils.toString(httpEntity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            if (response != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    Log.e("response", jsonObject.toString());
+                    JSONObject jsonData = jsonObject.getJSONObject("data");
+                    if (jsonData.has("id")) {
+                        //сохранение данных пользователя
+                       String username = jsonData.getString("username");
+//                        appPreferences.putString(AppPreferences.USER_ID, jsonData.getString("id"));
+//                        appPreferences.putString(AppPreferences.USER_NAME, jsonData.getString("username"));
+//                        appPreferences.putString(AppPreferences.PROFILE_PIC, jsonData.getString("profile_picture"));
+
+                        Toast toast = Toast.makeText(getApplicationContext(),"Sukses",Toast.LENGTH_LONG);
+                        toast.show();
+                        Intent intent = new Intent(MainActivity.this, HomePage.class);
+                        intent.putExtra("AKUN",  username);
+                        startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                Toast toast = Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+    }
+
 
 
 

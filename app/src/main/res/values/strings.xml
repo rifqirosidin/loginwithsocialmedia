@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">EAI UTS</string>
     <string name="facebook_app_id">509874796461197</string>
+    <string name="CONSUMER_KEY">PyJLQOqgTnDOlz1d47pbgf9JE</string>
+    <string name="CONSUMER_SECRET">pHoY3bFges7MPTAMeeDZpD8amNwvvBr8X1bnEgIg4Qgilpp1Kb</string>
     <string name="fb_login_protocol_scheme">fb509874796461197</string>
     <string name="title_activity_home_page">Artikel</string>
     <string name="server_client_id">346671154197-9klsv8251umjp1gr0nnmgr7fngo0936r.apps.googleusercontent.com</string>
     <string name="cancel">cancel</string>
+    <string name="client_id">9e08f428f1864b55853f786a82cc926a</string>
+    <string name="client_secret">a9c12f23b1114fbe8944379707071950</string>
+    <string name="redirect_url">https://titipmasa.id/</string>
+    <string name="base_url">https://api.instagram.com/</string>
+    <string name="get_user_info_url">https://api.instagram.com/v1/users/self/?access_token=</string>
 </resources>
