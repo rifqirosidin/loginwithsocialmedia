@@ -63,6 +63,7 @@ public class HomePage extends AppCompatActivity {
         });
         Intent intent = getIntent();
         nama = intent.getStringExtra("AKUN");
+        getPostData();
     }
 
     public void getPostData()

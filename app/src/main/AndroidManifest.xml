@@ -33,6 +33,9 @@
             android:name=".DetailPost"
             android:parentActivityName=".HomePage" />
         <activity
+            android:name=".ajeng.MovieList"
+            />
+        <activity
             android:name=".TwitterHelper"
             android:parentActivityName=".MainActivity" />
         <activity

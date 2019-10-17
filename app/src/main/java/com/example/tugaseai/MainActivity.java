@@ -7,13 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tugaseai.ajeng.MovieList;
 import com.example.tugaseai.api.EndPoint;
 import com.example.tugaseai.api.RetrofitClient;
 import com.example.tugaseai.model.User;
@@ -35,13 +34,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.squareup.picasso.Picasso;
-import com.twitter.sdk.android.core.DefaultLogger;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterConfig;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.TwitterSession;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -53,7 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import retrofit2.Call;
@@ -236,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationLis
 
     private void onLoggedIn(GoogleSignInAccount account) {
 
-        Intent intent = new Intent(this, HomePage.class);
+        Intent intent = new Intent(MainActivity.this, HomePage.class);
         intent.putExtra("AKUN", account.getDisplayName());
 
         startActivity(intent);
@@ -342,29 +333,27 @@ public class MainActivity extends AppCompatActivity implements AuthenticationLis
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
-            if (response != null) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    Log.e("response", jsonObject.toString());
-                    JSONObject jsonData = jsonObject.getJSONObject("data");
-                    if (jsonData.has("id")) {
-                        //сохранение данных пользователя
-                       String username = jsonData.getString("username");
+            if (response != null) try {
+                JSONObject jsonObject = new JSONObject(response);
+                Log.e("response", jsonObject.toString());
+                JSONObject jsonData = jsonObject.getJSONObject("data");
+                if (jsonData.has("id")) {
+                    //сохранение данных пользователя
+                    String username = jsonData.getString("username");
 //                        appPreferences.putString(AppPreferences.USER_ID, jsonData.getString("id"));
 //                        appPreferences.putString(AppPreferences.USER_NAME, jsonData.getString("username"));
 //                        appPreferences.putString(AppPreferences.PROFILE_PIC, jsonData.getString("profile_picture"));
 
-                        Toast toast = Toast.makeText(getApplicationContext(),"Sukses",Toast.LENGTH_LONG);
-                        toast.show();
-                        Intent intent = new Intent(MainActivity.this, HomePage.class);
-                        intent.putExtra("AKUN",  username);
-                        startActivity(intent);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    Toast toast = Toast.makeText(getApplicationContext(), "Sukses", Toast.LENGTH_LONG);
+                    toast.show();
+                    Intent intent = new Intent(MainActivity.this, HomePage.class);
+                    intent.putExtra("AKUN", username);
+                    startActivity(intent);
                 }
-
-            } else {
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            else {
                 Toast toast = Toast.makeText(getApplicationContext(),"Failed",Toast.LENGTH_LONG);
                 toast.show();
             }
